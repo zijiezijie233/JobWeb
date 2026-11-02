@@ -4,6 +4,12 @@ const router = createRouter({
   history: createWebHashHistory(),
   routes: [
     {
+      path: '/profile',
+      name: 'applicant-profile',
+      component: () => import('@/views/ApplicantProfile.vue'),
+      meta: { title: '个人报考档案' },
+    },
+    {
       path: '/',
       name: 'positions',
       component: () => import('@/views/PositionList.vue'),

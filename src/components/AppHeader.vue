@@ -13,6 +13,7 @@ const navs = [
   { to: '/', label: '岗位信息', exact: true },
   { to: '/timeline', label: '考试时间线' },
   { to: '/favorites', label: '我的收藏' },
+  { to: '/profile', label: '报考档案' },
   { to: '/about', label: '关于' },
 ]
 

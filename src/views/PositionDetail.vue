@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { findPosition, meta, positions } from '@/data'
 import { useFavorites } from '@/composables/useFavorites'
+import EligibilityCheck from '@/components/EligibilityCheck.vue'
 
 const route = useRoute()
 const { isFavorite, toggleFavorite, isCompared, toggleCompare } = useFavorites()
@@ -116,6 +117,8 @@ function onCompare() {
           </div>
         </div>
       </section>
+
+      <EligibilityCheck :position="position" />
 
       <div class="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
         <div class="space-y-5">
