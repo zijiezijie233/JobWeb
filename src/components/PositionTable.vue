@@ -1,15 +1,24 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { Position } from '@/types'
 import { useFavorites } from '@/composables/useFavorites'
+import { deltaClass, formatDelta, formatScore, formatViews } from '@/utils/format'
+import { scoreSummary } from '@/utils/scores'
+import { useViewStats } from '@/composables/useViewStats'
 
-defineProps<{ positions: Position[] }>()
+const props = defineProps<{ positions: Position[] }>()
 const { isFavorite, toggleFavorite } = useFavorites()
+const { viewCountOf } = useViewStats()
+
+const rows = computed(() =>
+  props.positions.map((p) => ({ p, summary: scoreSummary(p), views: viewCountOf(p) })),
+)
 </script>
 
 <template>
   <div class="surface overflow-hidden">
     <div class="overflow-x-auto">
-      <table class="w-full min-w-[860px] border-collapse text-sm">
+      <table class="w-full min-w-[820px] border-collapse text-sm">
         <thead>
           <tr class="border-b border-slate-200 bg-slate-50/80 text-left text-xs text-slate-500 dark:border-slate-800 dark:bg-slate-800/40 dark:text-slate-400">
             <th class="px-4 py-3 font-medium">职位名称 / 单位</th>
@@ -17,14 +26,16 @@ const { isFavorite, toggleFavorite } = useFavorites()
             <th class="px-3 py-3 font-medium">学历</th>
             <th class="px-3 py-3 font-medium">专业要求</th>
             <th class="px-3 py-3 text-center font-medium">招录</th>
+            <th class="px-3 py-3 text-right font-medium">最低进面分</th>
+            <th class="px-3 py-3 text-right font-medium">浏览</th>
             <th class="px-3 py-3 text-center font-medium">操作</th>
           </tr>
         </thead>
         <tbody>
           <tr
-            v-for="p in positions"
+            v-for="{ p, summary, views } in rows"
             :key="p.id"
-            class="border-b border-slate-100 transition last:border-0 hover:bg-brand-50/40 dark:border-slate-800/80 dark:hover:bg-brand-500/5"
+            class="group border-b border-slate-100 transition last:border-0 hover:bg-brand-50/40 dark:border-slate-800/80 dark:hover:bg-brand-500/5"
           >
             <td class="px-4 py-3">
               <router-link :to="`/position/${p.id}`" class="font-medium text-slate-800 hover:text-brand-700 dark:text-slate-100 dark:hover:text-brand-300">
@@ -34,13 +45,24 @@ const { isFavorite, toggleFavorite } = useFavorites()
             </td>
             <td class="whitespace-nowrap px-3 py-3 text-xs text-slate-600 dark:text-slate-300">{{ p.city }} · {{ p.county }}</td>
             <td class="whitespace-nowrap px-3 py-3 text-xs text-slate-600 dark:text-slate-300">{{ p.education }}</td>
-            <td class="max-w-[240px] px-3 py-3 text-xs text-slate-500 dark:text-slate-400">
+            <td class="max-w-[190px] px-3 py-3 text-xs text-slate-500 dark:text-slate-400">
               <span class="line-clamp-2">{{ p.majorsRaw }}</span>
             </td>
             <td class="px-3 py-3 text-center font-semibold text-brand-700 dark:text-brand-300">{{ p.headcount }}</td>
+            <td class="whitespace-nowrap px-3 py-3 text-right">
+              <template v-if="summary.latest">
+                <span class="font-semibold tabular-nums text-slate-700 dark:text-slate-200">{{ formatScore(summary.latest.minScore) }}</span>
+                <span class="ml-1 text-[11px] tabular-nums" :class="deltaClass(summary.delta)">{{ formatDelta(summary.delta) }}</span>
+                <p class="text-[10px] text-slate-400 dark:text-slate-500">{{ summary.latest.year }} 年度</p>
+              </template>
+              <span v-else class="text-xs text-slate-300 dark:text-slate-600">暂无</span>
+            </td>
+            <td class="whitespace-nowrap px-3 py-3 text-right text-xs tabular-nums text-slate-500 dark:text-slate-400">
+              {{ formatViews(views) }}
+            </td>
             <td class="px-3 py-3">
               <div class="flex items-center justify-center gap-1">
-                <router-link :to="`/position/${p.id}`" class="rounded-md px-2 py-1 text-xs font-medium text-brand-700 hover:bg-brand-50 dark:text-brand-300 dark:hover:bg-brand-500/10">
+                <router-link :to="`/position/${p.id}`" class="whitespace-nowrap rounded-md px-2 py-1 text-xs font-medium text-brand-700 hover:bg-brand-50 dark:text-brand-300 dark:hover:bg-brand-500/10">
                   详情
                 </router-link>
                 <button

@@ -1,14 +1,28 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { findPosition, meta, positions } from '@/data'
 import { useFavorites } from '@/composables/useFavorites'
+import { useViewStats } from '@/composables/useViewStats'
+import { formatViews } from '@/utils/format'
 import EligibilityCheck from '@/components/EligibilityCheck.vue'
+import ScoreHistory from '@/components/ScoreHistory.vue'
 
 const route = useRoute()
 const { isFavorite, toggleFavorite, isCompared, toggleCompare } = useFavorites()
+const { viewCountOf, recordView } = useViewStats()
 
 const position = computed(() => findPosition(String(route.params.id)))
+const views = computed(() => (position.value ? viewCountOf(position.value) : 0))
+
+/** 每次进入（或切换到）某个岗位详情页，浏览量 +1 */
+watch(
+  () => String(route.params.id ?? ''),
+  (id) => {
+    if (id) recordView(id)
+  },
+  { immediate: true },
+)
 const toast = ref('')
 
 const fav = computed(() => (position.value ? isFavorite(position.value.id) : false))
@@ -95,6 +109,9 @@ function onCompare() {
                 <p class="text-2xl font-bold leading-tight text-brand-700 dark:text-brand-300">
                   {{ position.headcount }}<span class="ml-0.5 text-xs font-normal">人</span>
                 </p>
+                <p class="mt-1 border-t border-brand-200/70 pt-1 text-[11px] tabular-nums text-slate-500 dark:border-brand-500/30 dark:text-slate-400">
+                  {{ formatViews(views) }}次浏览
+                </p>
               </div>
               <div class="flex gap-2">
                 <button type="button" class="btn-ghost" :class="fav ? '!border-brand-300 !text-brand-700 dark:!text-brand-300' : ''" @click="onFav">
@@ -121,13 +138,15 @@ function onCompare() {
       <EligibilityCheck :position="position" />
 
       <div class="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
-        <div class="space-y-5">
+        <div class="min-w-0 space-y-5">
           <section class="surface p-5 sm:p-6">
             <h2 class="flex items-center gap-2 text-sm font-semibold">
               <span class="h-3.5 w-1 rounded-full bg-brand-600" />职位简介
             </h2>
             <p class="mt-3 text-sm leading-7 text-slate-600 dark:text-slate-300">{{ position.intro }}</p>
           </section>
+
+          <ScoreHistory :position="position" />
 
           <section class="surface p-5 sm:p-6">
             <h2 class="flex items-center gap-2 text-sm font-semibold">

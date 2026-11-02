@@ -58,6 +58,36 @@ import { meta, STATS } from '@/data'
     </section>
 
     <section class="surface mt-4 p-5 sm:p-7">
+      <h2 class="text-sm font-semibold">进面分与浏览数据</h2>
+      <dl class="mt-3 space-y-2.5 text-xs">
+        <div class="flex items-start justify-between gap-4">
+          <dt class="shrink-0 text-slate-500 dark:text-slate-400">进面分口径</dt>
+          <dd class="text-right leading-6 text-slate-700 dark:text-slate-300">{{ meta.scoreMeta.caliber }}</dd>
+        </div>
+        <div class="flex items-start justify-between gap-4">
+          <dt class="shrink-0 text-slate-500 dark:text-slate-400">覆盖年度</dt>
+          <dd class="text-right text-slate-700 dark:text-slate-300">{{ meta.scoreMeta.coverage }}</dd>
+        </div>
+        <div class="flex items-start justify-between gap-4">
+          <dt class="shrink-0 text-slate-500 dark:text-slate-400">进面分来源</dt>
+          <dd class="text-right leading-6 text-slate-700 dark:text-slate-300">{{ meta.scoreMeta.sourceName }}</dd>
+        </div>
+        <div class="flex items-start justify-between gap-4">
+          <dt class="shrink-0 text-slate-500 dark:text-slate-400">采集时间</dt>
+          <dd class="text-right text-slate-700 dark:text-slate-300">{{ meta.scoreMeta.collectedAt }}</dd>
+        </div>
+        <div class="flex items-start justify-between gap-4">
+          <dt class="shrink-0 text-slate-500 dark:text-slate-400">浏览量口径</dt>
+          <dd class="text-right leading-6 text-slate-700 dark:text-slate-300">{{ meta.viewMeta.label }}</dd>
+        </div>
+      </dl>
+      <p class="mt-3 rounded-lg bg-slate-50 px-4 py-3 text-[11px] leading-6 text-slate-500 dark:bg-slate-800/50 dark:text-slate-400">
+        {{ meta.scoreMeta.note }}
+        <br />{{ meta.viewMeta.note }}
+      </p>
+    </section>
+
+    <section class="surface mt-4 p-5 sm:p-7">
       <h2 class="text-sm font-semibold">免责声明</h2>
       <p class="mt-2 text-xs leading-6 text-slate-600 dark:text-slate-300">{{ meta.disclaimer }}</p>
       <p class="mt-3 text-xs leading-6 text-slate-600 dark:text-slate-300">

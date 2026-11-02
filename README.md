@@ -40,7 +40,7 @@ scripts/xlsx2json.mjs    # 官方职位表 Excel → positions.json
 | 路由 | 说明 |
 | --- | --- |
 | `/#/` | 岗位列表：筛选、搜索、排序、卡片/表格视图、分页，条件同步到 URL |
-| `/#/position/:id` | 岗位详情：报考条件、其他条件、咨询与来源、同地市岗位 |
+| `/#/position/:id` | 岗位详情：报考条件、资格核对、历年进面分（走势+明细）、其他条件、咨询与来源、同地市岗位 |
 | `/#/timeline` | 考试时间线：年度切换、节点状态（已完成/进行中/未开始）、倒计时 |
 | `/#/favorites` | 收藏与对比：最多 4 个岗位横向对比条件差异 |
 | `/#/about` | 数据概况、更新方式、免责声明 |
@@ -76,11 +76,26 @@ scripts/xlsx2json.mjs    # 官方职位表 Excel → positions.json
   "note": "备注",
   "phone": "029-85581001",
   "sourceUrl": "https://www.sxrsks.cn/",
+  "viewCount": 9361,            // 站点累计浏览量（展示值 = 该值 + 本机访问增量）
+  "interviewScores": [          // 历年最低进面分，按年度升序
+    { "year": 2022, "minScore": 207.5, "interviewCount": 6 },
+    { "year": 2023, "minScore": 202.5, "interviewCount": 6 },
+    { "year": 2024, "minScore": null, "remark": "该年度职位计划核减，无人进入面试" },
+    { "year": 2025, "minScore": 208.0, "interviewCount": 6 },
+    { "year": 2026, "minScore": 210.5, "interviewCount": 6 }
+  ],
   "updatedAt": "2026-11-02"
 }
 ```
 
 `majors` 建议使用 `src/data/index.ts` 中已出现的专业大类名称（如 `法学类`、`计算机类`），保证筛选侧边栏能命中。
+
+**进面分与浏览量两个字段的约定**
+- `minScore` 用一位小数（XX.0 / XX.5），与官方成绩单一致；该年度未公布或未招录时写 `null`，同时用 `remark` 说明原因，界面会显示为虚线柱 + 「未公布」，「较上年」一列自动跳过缺失年度并标注对比年份
+- 涨跌按「最新有成绩年度 vs 上一年度」计算，涨红跌绿（与国内行情口径一致）
+- `interviewCount` 为进入面试人数，一般等于招录人数 ×3；不足 3 倍时按实际写
+- `viewCount` 只是基准值，实际展示会叠加本机访问增量（`localStorage` 键 `sn-gwy-viewstats-v1`），因此每次进详情页 +1、返回列表实时更新；换设备/清缓存会回到基准值
+- 进面分数据源、统计口径、覆盖年度与采集时间统一在 `src/data/meta.json` 的 `scoreMeta` 中维护，改数据源只需改这一处
 
 ### 方式二：从官方职位表导入
 

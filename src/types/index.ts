@@ -1,3 +1,35 @@
+/** 历年最低进面分记录 */
+export interface InterviewScoreRecord {
+  /** 考试年度 */
+  year: number
+  /** 该职位进入面试人员的最低笔试总成绩；null 表示该年度未公布或未招录 */
+  minScore: number | null
+  /** 该年度进入面试人数 */
+  interviewCount?: number | null
+  /** 最低分缺失时的原因说明 */
+  remark?: string
+}
+
+/** 进面分数据的统计口径与来源 */
+export interface ScoreMeta {
+  /** 成绩口径说明 */
+  caliber: string
+  /** 数据来源 */
+  sourceName: string
+  /** 覆盖年度 */
+  coverage: string
+  /** 采集时间 */
+  collectedAt: string
+  /** 使用说明 */
+  note: string
+}
+
+/** 浏览量统计口径 */
+export interface ViewMeta {
+  label: string
+  note: string
+}
+
 export interface Position {
   /** 内部唯一 ID */
   id: string
@@ -45,6 +77,10 @@ export interface Position {
   phone: string
   /** 来源链接 */
   sourceUrl: string
+  /** 站点累计浏览量（基准值，页面展示时叠加本地访问增量） */
+  viewCount?: number
+  /** 历年最低进面分，按年度升序 */
+  interviewScores?: InterviewScoreRecord[]
   /** 数据更新时间 */
   updatedAt: string
 }
@@ -87,6 +123,10 @@ export interface ExamMeta {
   announcementUrl: string
   sourceName: string
   disclaimer: string
+  /** 进面分数据元信息 */
+  scoreMeta: ScoreMeta
+  /** 浏览量统计元信息 */
+  viewMeta: ViewMeta
 }
 
 export type SortKey = 'default' | 'headcount' | 'city' | 'unit'

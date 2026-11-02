@@ -2,14 +2,19 @@
 import { computed } from 'vue'
 import type { Position } from '@/types'
 import { useFavorites } from '@/composables/useFavorites'
-import { highlight } from '@/utils/format'
+import { deltaClass, formatDelta, formatScore, formatViews, highlight } from '@/utils/format'
+import { scoreSummary } from '@/utils/scores'
+import { useViewStats } from '@/composables/useViewStats'
 
 const props = defineProps<{ position: Position; keyword?: string }>()
 const { isFavorite, toggleFavorite } = useFavorites()
+const { viewCountOf } = useViewStats()
 
 const fav = computed(() => isFavorite(props.position.id))
 const nameParts = computed(() => highlight(props.position.name, props.keyword ?? ''))
 const unitParts = computed(() => highlight(`${props.position.org} · ${props.position.unit}`, props.keyword ?? ''))
+const views = computed(() => viewCountOf(props.position))
+const summary = computed(() => scoreSummary(props.position))
 </script>
 
 <template>
@@ -57,6 +62,21 @@ const unitParts = computed(() => highlight(`${props.position.org} · ${props.pos
     <p class="mt-3 line-clamp-2 break-words text-xs leading-relaxed text-slate-500 dark:text-slate-400">
       专业：{{ position.majorsRaw }}
     </p>
+
+    <div class="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-slate-400 dark:text-slate-500">
+      <span class="inline-flex items-center gap-1">
+        <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z" />
+          <circle cx="12" cy="12" r="2.6" />
+        </svg>
+        {{ formatViews(views) }}次浏览
+      </span>
+      <span v-if="summary.latest" class="inline-flex items-center gap-1">
+        {{ summary.latest.year }} 年最低进面
+        <b class="font-semibold tabular-nums text-slate-600 dark:text-slate-300">{{ formatScore(summary.latest.minScore) }}</b>
+        <span class="tabular-nums" :class="deltaClass(summary.delta)">{{ formatDelta(summary.delta) }}</span>
+      </span>
+    </div>
 
     <div class="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 dark:border-slate-800">
       <div class="flex items-baseline gap-3">

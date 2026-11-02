@@ -62,6 +62,33 @@ export function countdownLabel(value: string): string {
   return `已过去 ${Math.abs(diff)} 天`
 }
 
+/** 212.5 → 212.5；缺失 → — */
+export function formatScore(value: number | null | undefined): string {
+  return typeof value === 'number' && Number.isFinite(value) ? value.toFixed(1) : '—'
+}
+
+/** 12980 → 1.3 万；8634 → 8,634 */
+export function formatViews(value: number): string {
+  if (!Number.isFinite(value) || value < 0) return '—'
+  if (value < 10_000) return value.toLocaleString('zh-CN')
+  return `${(value / 10_000).toFixed(1)} 万`
+}
+
+/** 4.5 → ▲4.5 / -2 → ▼2.0 / 0 → 持平 */
+export function formatDelta(value: number | null): string {
+  if (value === null || !Number.isFinite(value)) return '—'
+  if (Math.abs(value) < 0.05) return '持平'
+  return value > 0 ? `▲${value.toFixed(1)}` : `▼${Math.abs(value).toFixed(1)}`
+}
+
+/** 涨跌对应的语义色：涨红跌绿（与国内行情口径一致） */
+export function deltaClass(value: number | null): string {
+  if (value === null || Math.abs(value) < 0.05) return 'text-slate-400 dark:text-slate-500'
+  return value > 0
+    ? 'text-rose-600 dark:text-rose-400'
+    : 'text-emerald-600 dark:text-emerald-400'
+}
+
 export function highlight(text: string, keyword: string): { text: string; hit: boolean }[] {
   const kw = keyword.trim()
   if (!kw) return [{ text, hit: false }]
